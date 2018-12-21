@@ -166,12 +166,38 @@ create-bidirectional-movement-command <fwd-command> <bkwd-command> <partial-name
             echo "
             define-command  select-surrounding-$3 %{
                 try %{
-                    select-surrounding $1 extend-backward-$3 true
-                } catch %{
                     select-surrounding $2 extend-forward-$3 false
+                } catch %{
+                    select-surrounding $1 extend-backward-$3 true
                 }
             }"
         }
+    }
+}
+
+define-command -params 2 create-regex-movement-command -docstring %{
+create-regex-movement-command <partial-name> <regex>
+    Create a bidirectional movement commands based on a regex string
+    The following commands will be created after calling this command:
+        jump-forward-<partial-name>
+        jump-backward-<partial-name>
+        select-forward-<partial-name>
+        extend-forward-<partial-name>
+        select-backward-<partial-name>
+        extend-backward-<partial-name>
+        select-surrounding-<partial-name>
+} %{
+    evaluate-commands %sh{
+        echo "
+        define-command jump-forward-$1 %{
+            jump-forward-regex-end $2
+        }
+
+        define-command jump-backward-$1 %{
+            jump-backward-regex-start $2
+        }
+
+        create-bidirectional-movement-command jump-forward-$1 jump-backward-$1 $1 0"
     }
 }
 
@@ -228,6 +254,8 @@ Performs a forward regex search, but fails instead of wrapping
 } %{
     evaluate-commands -save-regs ab/ %{
 
+        echo -debug "search-no-wrap"
+        echo -debug %arg{1}
         set-register a %val{cursor_byte_offset}
         set-register / %arg{1}
         execute-keys '"bZ'
