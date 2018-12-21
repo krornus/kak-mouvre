@@ -1,2 +1,2 @@
 # kak-mouvre
-Actually, it's pronounced "m-oo-v"
+Actually, it's pronounced "mouv"
