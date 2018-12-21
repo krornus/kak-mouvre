@@ -147,10 +147,66 @@ create-movement-command <command> <partial-name> <params>
     }
 }
 
-create-movement-command jump-forward-regex-start forward-regex-start 1
-create-movement-command jump-forward-regex-end forward-regex-end 1
-create-movement-command jump-backward-regex-start backward-regex-start 1
-create-movement-command jump-backward-regex-end backward-regex-end 1
+define-command -command-completion -params 4 create-bidirectional-movement-command -docstring %{
+create-bidirectional-movement-command <fwd-command> <bkwd-command> <partial-name> <params>
+    Creates five new movement commands which make use of <fwd-command> and <bkwd-command>
+    The five commands are:
+        select-forward-<partial-name>
+        extend-forward-<partial-name>
+        select-backward-<partial-name>
+        extend-backward-<partial-name>
+        select-surrounding-<partial-name>
+
+    The commands will require <params> argument count
+} %{
+    evaluate-commands %{
+        evaluate-commands %sh{
+            echo "create-movement-command $1 forward-$3 $4"
+            echo "create-movement-command $2 backward-$3 $4"
+            echo "
+            define-command  select-surrounding-$3 %{
+                try %{
+                    select-surrounding $1 extend-backward-$3 true
+                } catch %{
+                    select-surrounding $2 extend-forward-$3 false
+                }
+            }"
+        }
+    }
+}
+
+# parameter 1: jump
+# parameter 2: extend
+# parameter 3: forward: (true/false)
+define-command -hidden -params 3 select-surrounding %{
+    evaluate-commands -save-regs abs %{
+        execute-keys '"sZ'
+        set-register a %val{cursor_byte_offset}
+        %arg{1}
+        set-register b %val{cursor_byte_offset}
+        %arg{2}
+        evaluate-commands %sh{
+            if [ "$3" = "true" ]; then
+                mid=$(echo $kak_reg_a | tr -d "'")
+                end=$(echo $kak_reg_b | tr -d "'")
+                start=$(echo $kak_cursor_byte_offset | tr -d "'")
+            elif [ "$3" = "false" ]; then
+                mid=$(echo $kak_reg_a | tr -d "'")
+                start=$(echo $kak_reg_b | tr -d "'")
+                end=$(echo $kak_cursor_byte_offset | tr -d "'")
+            else
+                echo fail "select-surrounding: invalid direction"
+                return 1
+            fi
+
+            if [  "$mid" -lt "$start" -o "$mid" -gt "$end" ]; then
+                echo "execute-keys '\"sz'"
+                echo "fail 'No selections remaining'"
+            fi
+        }
+        execute-keys "<a-:>"
+    }
+}
 
 define-command jump-start -docstring %{
 jump-start
@@ -208,3 +264,9 @@ Performs a reverse regex search, but fails instead of wrapping
         }
     }
 }
+
+create-movement-command jump-forward-regex-start forward-regex-start 1
+create-movement-command jump-forward-regex-end forward-regex-end 1
+create-movement-command jump-backward-regex-start backward-regex-start 1
+create-movement-command jump-backward-regex-end backward-regex-end 1
+
