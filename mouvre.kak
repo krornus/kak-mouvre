@@ -180,7 +180,7 @@ create-bidirectional-movement-command <fwd-command> <bkwd-command> <partial-name
 # parameter 3: forward: (true/false)
 define-command -hidden -params 3 select-surrounding %{
     evaluate-commands -save-regs abs %{
-        execute-keys '"sZ'
+        execute-keys '"sZ;'
         set-register a %val{cursor_byte_offset}
         %arg{1}
         set-register b %val{cursor_byte_offset}
