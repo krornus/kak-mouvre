@@ -6,12 +6,13 @@ Place in autoload or use [plug.kak](https://github.com/andreyorst/plug.kak).
 
 # Overview
 mouvre provides helper commands for defining custom movements. The following terminology is employed for commands:
-    "jump" implies the cursor moves to a location and reduces the selection to the cursor.
-        Example: `gj`
-    "select" implies the cursor moves to a location and selects from the previous location to current location.
-        Example: `w`
-    "extend" impales the cursor moves to a location and selects from the previous location to current location.
-        Example: `W`
+
+###### "jump" implies the cursor moves to a location and reduces the selection to the cursor.
+Example: `gj`
+###### "select" implies the cursor moves to a location and selects from the previous location to current location.
+Example: `w`
+###### "extend" impales the cursor moves to a location and selects from the previous location to current location.
+Example: `W`
 
 # TL;DR
 The following commands are provided with the plugin:
