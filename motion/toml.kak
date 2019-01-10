@@ -1,10 +1,11 @@
-declare-option -hidden str header %{^\[+[a-zA-Z0-9_\-\.]+(?:"[^"]*")?(?:'[^']*')?\]+$}
+declare-option -hidden str toml_table %{^\[+[a-zA-Z0-9_\-\.]+(?:"[^"]*")?(?:'[^']*')?\]+$}
 
 add-highlighter shared/toml-section group
-add-highlighter shared/toml-section/ regex %opt{header} 0:white+b
+add-highlighter shared/toml-section/ regex %opt{toml_table} 0:white+b
 
 hook global BufCreate .*\.(toml) %{
     set-option buffer filetype toml
+    create-regex-movement-command toml-section %opt{toml_table}
 }
 
 hook -group toml-section-highlight global WinSetOption filetype=toml %{
@@ -30,12 +31,3 @@ hook -group toml-section-hook global WinSetOption filetype=(?!toml).* %{
     map buffer normal <a-n> <a-n>
 }
 
-define-command jump-forward-toml-section %{
-    jump-forward-regex-start %opt{header}
-}
-
-define-command jump-backward-toml-section %{
-    jump-backward-regex-start %opt{header}
-}
-
-create-bidirectional-movement-command jump-forward-toml-section jump-backward-toml-section toml-section 0

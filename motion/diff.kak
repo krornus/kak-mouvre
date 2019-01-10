@@ -1,3 +1,5 @@
+# TODO: support not git diff also
+
 declare-option -hidden str gitdiff_head "^diff\s+--git\s+((?:(?:[^\s])|(\\\s))+)\s+((?:(?:[^\s])|(\\\s))+)$"
 
 add-highlighter shared/diff-chunk group
@@ -8,7 +10,7 @@ hook -group diff-chunk-highlight global WinSetOption filetype=diff %{
 }
 
 hook -group diff-chunk-hook global WinSetOption filetype=diff %{
-    hook buffer -group diff-chunk-hooks NormalKey p diff-chunk-next-chunk
+    create-bidirectional-movement-command jump-forward-diff-chunk jump-backward-diff-chunk diff-chunk 0
 
     map buffer normal n :select-forward-diff-chunk<ret>
     map buffer normal N :extend-forward-diff-chunk<ret>
@@ -34,4 +36,3 @@ define-command jump-backward-diff-chunk %{
     jump-backward-regex-start %opt{gitdiff_head}
 }
 
-create-bidirectional-movement-command jump-forward-diff-chunk jump-backward-diff-chunk diff-chunk 0
