@@ -11,6 +11,7 @@
 #   (select|extend)-by-command                                 #
 #                                                              #
 ################################################################
+declare-option -hidden str mouvre_version "1.0"
 
 define-command -params 1 extend-to-offset -docstring %{
 extend-to-offset <offset>
@@ -253,9 +254,6 @@ search-no-wrap
 Performs a forward regex search, but fails instead of wrapping
 } %{
     evaluate-commands -save-regs ab/ %{
-
-        echo -debug "search-no-wrap"
-        echo -debug %arg{1}
         set-register a %val{cursor_byte_offset}
         set-register / %arg{1}
         execute-keys '"bZ'
